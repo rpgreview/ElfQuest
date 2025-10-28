@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ElfQuest — Character Sheet (Experience)</title>
+  <style>
+    body{font-family:Arial, sans-serif; background:#f4f4f8; color:#222; padding:20px;}
+    .wrap{max-width:1000px;margin:0 auto}
+    h1{font-size:24px;margin-bottom:10px}
+    h2{margin-top:20px;font-size:20px;border-bottom:2px solid #444;padding-bottom:4px}
+    .card{background:#fff;padding:16px;margin-bottom:16px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+    label{display:block;margin-top:10px;font-weight:bold}
+    input[type=text]{width:100%;padding:6px;margin-top:4px;border:1px solid #ccc;border-radius:4px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th, td{border:1px solid #ccc;padding:6px;text-align:left}
+    th{background:#eee}
+    .small{width:120px;display:inline-block}
+    button{margin-top:10px;padding:8px 12px;border:none;background:#007BFF;color:#fff;border-radius:4px;cursor:pointer}
+    .xp-status{margin-top:8px;font-weight:600}
+    td.center{ text-align:center; }
+    td.right{ text-align:right; }
+    .hint{font-size:12px;color:#555;margin-top:6px}
+    .age-honouric{font-weight:700;margin-left:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>ElfQuest Character Sheet</h1>
+
+    <div class="card">
+      <h2>Personal Information</h2>
+      <label>Player Name:<input type="text" id="playerName"></label>
+      <label>Character's Name:<input type="text" id="characterName"></label>
+      <label>Soul Name:<input type="text" id="soulName"></label>
+      <label>Species:<input type="text" id="species"></label>
+      <label>Tribe:<input type="text" id="tribe"></label>
+      <label>Age:<input type="text" id="age"><span id="ageHonouric" class="age-honouric"></span></label>
+      <label>Gender:<input type="text" id="gender"></label>
+      <label>Recognised Mate:<input type="text" id="recognisedMate"></label>
+      <button id="rollStats">Roll Characteristics & Age</button>
+      <div class="hint">Note: Species must be entered before rolling.</div>
+    </div>
+
+    <div class="card">
+      <h2>Rolled Characteristics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Characteristic</th><th class="center">STR</th><th class="center">CON</th><th class="center">SIZ</th>
+            <th class="center">INT</th><th class="center">POW</th><th class="center">DEX</th><th class="center">APP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Current</td>
+            <td><input type="text" id="currentSTR"></td>
+            <td><input type="text" id="currentCON"></td>
+            <td><input type="text" id="currentSIZ"></td>
+            <td><input type="text" id="currentINT"></td>
+            <td><input type="text" id="currentPOW"></td>
+            <td><input type="text" id="currentDEX"></td>
+            <td><input type="text" id="currentAPP"></td>
+          </tr>
+          <tr>
+            <td>Original</td>
+            <td><input type="text" id="originalSTR"></td>
+            <td><input type="text" id="originalCON"></td>
+            <td><input type="text" id="originalSIZ"></td>
+            <td><input type="text" id="originalINT"></td>
+            <td><input type="text" id="originalPOW"></td>
+            <td><input type="text" id="originalDEX"></td>
+            <td><input type="text" id="originalAPP"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Derived Characteristics</h2>
+      <label>Damage Bonus:<input type="text" id="damageBonus"></label>
+      <label>Experience Bonus:<input type="text" id="experienceBonus"></label>
+      <label>Hit Points:<input type="text" id="hitPoints"></label>
+      <label>Magic Points:<input type="text" id="magicPoints"></label>
+      <label>Movement:<input type="text" id="movement"></label>
+      <label>Strike Rank (DEX):<input type="text" id="srDEX"></label>
+      <label>Strike Rank (SIZ):<input type="text" id="srSIZ"></label>
+    </div>
+
+    <div class="card">
+      <h2>Skills (Initial Values – Wolfrider Tribe)</h2>
+      <div id="xpStatus" class="xp-status">Previous Experience Points Remaining: <span id="xpRemaining">0</span></div>
+      <div class="hint">Hover the “Previous Experience” header to see pool breakdown.</div>
+      <table id="skillsTable" border="1" cellspacing="0" cellpadding="4">
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Formula</th>
+            <th>Initial Value</th>
+            <th title="" id="prevHeader">Previous Experience</th>
+            <th>Earned Experience</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Animal Lore</td><td>INT*2</td><td id="skill-animal-lore">0</td><td id="skill-animal-lore-prev" class="edit">0</td><td id="skill-animal-lore-earned" class="edit">0</td><td id="skill-animal-lore-total">0</td></tr>
+          <tr><td>Climb</td><td>((STR+DEX)*2)-SIZ</td><td id="skill-climb">0</td><td id="skill-climb-prev" class="edit">0</td><td id="skill-climb-earned" class="edit">0</td><td id="skill-climb-total">0</td></tr>
+          <tr><td>Communication</td><td>POW+INT</td><td id="skill-communication">0</td><td id="skill-communication-prev" class="edit">0</td><td id="skill-communication-earned" class="edit">0</td><td id="skill-communication-total">0</td></tr>
+          <tr><td>Dodge</td><td>(DEX*3)-SIZ</td><td id="skill-dodge">0</td><td id="skill-dodge-prev" class="edit">0</td><td id="skill-dodge-earned" class="edit">0</td><td id="skill-dodge-total">0</td></tr>
+          <tr><td>Elf Lore</td><td>INT*3</td><td id="skill-elf-lore">0</td><td id="skill-elf-lore-prev" class="edit">0</td><td id="skill-elf-lore-earned" class="edit">0</td><td id="skill-elf-lore-total">0</td></tr>
+          <tr><td>Healing Lore</td><td>INT*2</td><td id="skill-healing-lore">0</td><td id="skill-healing-lore-prev" class="edit">0</td><td id="skill-healing-lore-earned" class="edit">0</td><td id="skill-healing-lore-total">0</td></tr>
+          <tr><td>Hearing</td><td>APP*2</td><td id="skill-hearing">0</td><td id="skill-hearing-prev" class="edit">0</td><td id="skill-hearing-earned" class="edit">0</td><td id="skill-hearing-total">0</td></tr>
+          <tr><td>Human Lore</td><td>INT*2</td><td id="skill-human-lore">0</td><td id="skill-human-lore-prev" class="edit">0</td><td id="skill-human-lore-earned" class="edit">0</td><td id="skill-human-lore-total">0</td></tr>
+          <tr><td>Jump</td><td>(STR+DEX)*2</td><td id="skill-jump">0</td><td id="skill-jump-prev" class="edit">0</td><td id="skill-jump-earned" class="edit">0</td><td id="skill-jump-total">0</td></tr>
+          <tr><td>Language Lore</td><td>INT*2</td><td id="skill-language-lore">0</td><td id="skill-language-lore-prev" class="edit">0</td><td id="skill-language-lore-earned" class="edit">0</td><td id="skill-language-lore-total">0</td></tr>
+          <tr><td>Manipulation</td><td>STR+DEX</td><td id="skill-manipulation">0</td><td id="skill-manipulation-prev" class="edit">0</td><td id="skill-manipulation-earned" class="edit">0</td><td id="skill-manipulation-total">0</td></tr>
+          <tr><td>Mechanical Lore</td><td>INT/2</td><td id="skill-mechanical-lore">0</td><td id="skill-mechanical-lore-prev" class="edit">0</td><td id="skill-mechanical-lore-earned" class="edit">0</td><td id="skill-mechanical-lore-total">0</td></tr>
+          <tr><td>Mineral Lore</td><td>INT/2</td><td id="skill-mineral-lore">0</td><td id="skill-mineral-lore-prev" class="edit">0</td><td id="skill-mineral-lore-earned" class="edit">0</td><td id="skill-mineral-lore-total">0</td></tr>
+          <tr><td>Plant Lore</td><td>INT*2</td><td id="skill-plant-lore">0</td><td id="skill-plant-lore-prev" class="edit">0</td><td id="skill-plant-lore-earned" class="edit">0</td><td id="skill-plant-lore-total">0</td></tr>
+          <tr><td>Ride Wolf</td><td>DEX*4</td><td id="skill-ride-wolf">0</td><td id="skill-ride-wolf-prev" class="edit">0</td><td id="skill-ride-wolf-earned" class="edit">0</td><td id="skill-ride-wolf-total">0</td></tr>
+          <tr><td>Sight</td><td>APP*2</td><td id="skill-sight">0</td><td id="skill-sight-prev" class="edit">0</td><td id="skill-sight-earned" class="edit">0</td><td id="skill-sight-total">0</td></tr>
+          <tr><td>Stealth</td><td>((INT+DEX)*2)-SIZ</td><td id="skill-stealth">0</td><td id="skill-stealth-prev" class="edit">0</td><td id="skill-stealth-earned" class="edit">0</td><td id="skill-stealth-total">0</td></tr>
+          <tr><td>Swim</td><td>STR+DEX</td><td id="skill-swim">0</td><td id="skill-swim-prev" class="edit">0</td><td id="skill-swim-earned" class="edit">0</td><td id="skill-swim-total">0</td></tr>
+          <tr><td>Throw</td><td>STR+DEX</td><td id="skill-throw">0</td><td id="skill-throw-prev" class="edit">0</td><td id="skill-throw-earned" class="edit">0</td><td id="skill-throw-total">0</td></tr>
+          <tr><td>Troll Lore</td><td>INT*2</td><td id="skill-troll-lore">0</td><td id="skill-troll-lore-prev" class="edit">0</td><td id="skill-troll-lore-earned" class="edit">0</td><td id="skill-troll-lore-total">0</td></tr>
+          <tr><td>Sending</td><td>POW*4</td><td id="skill-sending">0</td><td id="skill-sending-prev" class="edit">0</td><td id="skill-sending-earned" class="edit">0</td><td id="skill-sending-total">0</td></tr>
+          <tr><td>Magic Feeling</td><td>POW</td><td id="skill-magic-feeling">0</td><td id="skill-magic-feeling-prev" class="edit">0</td><td id="skill-magic-feeling-earned" class="edit">0</td><td id="skill-magic-feeling-total">0</td></tr>
+          <tr><td>Wolf Bonding</td><td>POW*5</td><td id="skill-wolf-bonding">0</td><td id="skill-wolf-bonding-prev" class="edit">0</td><td id="skill-wolf-bonding-earned" class="edit">0</td><td id="skill-wolf-bonding-total">0</td></tr>
+          <tr><td>Melee</td><td>STR+DEX</td><td id="skill-melee">0</td><td id="skill-melee-prev" class="edit">0</td><td id="skill-melee-earned" class="edit">0</td><td id="skill-melee-total">0</td></tr>
+          <tr><td>Missile</td><td>STR+DEX</td><td id="skill-missile">0</td><td id="skill-missile-prev" class="edit">0</td><td id="skill-missile-earned" class="edit">0</td><td id="skill-missile-total">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px">
+        <button id="resetExperience">Reset Experience</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Utilities
+function rollDice(n, sides) { let total=0; for(let i=0;i<n;i++) total += Math.floor(Math.random()*sides)+1; return total; }
+function percentile(){ return Math.floor(Math.random()*100)+1; }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+// Age factor & honouric
+function ageFactor(age){
+  if(age<=20) return 2;
+  if(age<=100) return 3;
+  if(age<=400) return 4;
+  if(age<=800) return 5;
+  return 6;
+}
+function honouric(age){
+  if(age<=20) return 'Child';
+  if(age<=100) return 'Youth';
+  if(age<=400) return 'Adult';
+  if(age<=800) return 'Elder';
+  return 'Ancient';
+}
+
+// Calculate XP pool
+function calcXPpool(){
+  const INT = parseInt(document.getElementById('currentINT').value)||0;
+  const POW = parseInt(document.getElementById('currentPOW').value)||0;
+  const APP = parseInt(document.getElementById('currentAPP').value)||0;
+  const age = parseInt(document.getElementById('age').value)||0;
+  const base = (INT*3) + (POW*3) + APP;
+  const factor = age>0 ? ageFactor(age) : 0;
+  return { base: base, factor: factor, pool: base * factor };
+}
+
+// Update age honouric display and header tooltip
+function updateAgeDisplay(){
+  const age = parseInt(document.getElementById('age').value)||0;
+  const hon = age>0 ? honouric(age) : '';
+  document.getElementById('ageHonouric').textContent = hon ? '('+hon+')' : '';
+  const xp = calcXPpool();
+  const header = document.getElementById('prevHeader');
+  header.title = xp.pool>0 ? `Pool = (INT*3 + POW*3 + APP) × Age Factor = (${xp.base}) × ${xp.factor} = ${xp.pool} (Honouric: ${hon})` : 'Enter stats and age to compute pool';
+  document.getElementById('xpRemaining').textContent = xp.pool - totalPrevAllocated();
+}
+
+// Helpers for totals
+function totalPrevAllocated(){
+  let sum = 0;
+  document.querySelectorAll('#skillsTable td[id$="-prev"]').forEach(td=>{
+    const v = parseInt(td.textContent)||0;
+    sum += v;
+  });
+  return sum;
+}
+function totalEarned(){
+  let sum=0;
+  document.querySelectorAll('#skillsTable td[id$="-earned"]').forEach(td=>{
+    const v = parseInt(td.textContent)||0;
+    sum += v;
+  });
+  return sum;
+}
+
+// Evaluate formula cells and set initial values
+function updateInitialValues(){
+  const tribe = document.getElementById('tribe').value.trim().toLowerCase();
+  const stats = {
+    STR: parseInt(document.getElementById('currentSTR').value)||0,
+    CON: parseInt(document.getElementById('currentCON').value)||0,
+    SIZ: parseInt(document.getElementById('currentSIZ').value)||0,
+    INT: parseInt(document.getElementById('currentINT').value)||0,
+    POW: parseInt(document.getElementById('currentPOW').value)||0,
+    DEX: parseInt(document.getElementById('currentDEX').value)||0,
+    APP: parseInt(document.getElementById('currentAPP').value)||0
+  };
+  document.querySelectorAll('#skillsTable tbody tr').forEach(row=>{
+    const formulaCell = row.cells[1];
+    const initialCell = row.cells[2];
+    if(tribe === 'wolfrider'){
+      try{
+        let expr = formulaCell.textContent;
+        expr = expr.replace(/STR/g, stats.STR).replace(/CON/g, stats.CON).replace(/SIZ/g, stats.SIZ)
+                   .replace(/INT/g, stats.INT).replace(/POW/g, stats.POW).replace(/DEX/g, stats.DEX)
+                   .replace(/APP/g, stats.APP);
+        const val = Math.max(0, Math.floor(eval(expr)));
+        initialCell.textContent = val;
+      }catch(e){
+        initialCell.textContent = 'ERR';
+      }
+    } else {
+      initialCell.textContent = 'N/A';
+    }
+  });
+  // after initial values update, update totals and xp display
+  recomputeAllTotals();
+  updateAgeDisplay();
+}
+
+// Recompute totals column
+function recomputeAllTotals(){
+  document.querySelectorAll('#skillsTable tbody tr').forEach(row=>{
+    const cells = row.cells;
+    const initialCell = cells[2];
+    const prevCell = cells[3];
+    const earnedCell = cells[4];
+    const totalCell = cells[5];
+    const initial = parseInt(initialCell.textContent)||0;
+    const prev = parseInt(prevCell.textContent)||0;
+    const earned = parseInt(earnedCell.textContent)||0;
+    totalCell.textContent = initial + prev + earned;
+  });
+  // update remaining
+  const pool = calcXPpool().pool;
+  const remaining = pool - totalPrevAllocated();
+  document.getElementById('xpRemaining').textContent = remaining>=0 ? remaining : 0;
+  updateAgeDisplay();
+}
+
+// Validate previous allocation input to not exceed pool
+function onPrevInput(td){
+  // parse value typed
+  let val = parseInt(td.textContent);
+  if(isNaN(val)) val = 0;
+  if(val<0) val = 0; // previous experience cannot be negative
+  // compute max allowed for this cell = pool - (sum of other prevs)
+  const pool = calcXPpool().pool;
+  const others = totalPrevAllocated() - val;
+  const maxAllowed = Math.max(0, pool - others);
+  if(val > maxAllowed){
+    val = maxAllowed;
+    td.textContent = String(val);
+  }
+  recomputeAllTotals();
+}
+
+// Earned input allows negatives
+function onEarnedInput(td){
+  let val = parseInt(td.textContent);
+  if(isNaN(val)) val = 0;
+  td.textContent = String(val);
+  recomputeAllTotals();
+}
+
+// Set contentEditable and hooks for prev and earned cells
+function makeEditableExperienceCells(){
+  document.querySelectorAll('#skillsTable td.edit').forEach(td=>{
+    td.contentEditable = 'true';
+    // prev cells have ids ending with -prev; earned cells end with -earned
+    if(td.id.endsWith('-prev')){
+      td.addEventListener('input', ()=>{ onPrevInput(td); });
+      td.addEventListener('blur', ()=>{ onPrevInput(td); });
+    } else if(td.id.endsWith('-earned')){
+      td.addEventListener('input', ()=>{ onEarnedInput(td); });
+      td.addEventListener('blur', ()=>{ onEarnedInput(td); });
+    } else {
+      // some browsers assign class edit to both; determine by position: prev is column 4 (index 3)
+      td.addEventListener('input', ()=>{ onPrevInput(td); });
+      td.addEventListener('blur', ()=>{ onPrevInput(td); });
+    }
+  });
+}
+
+// Reset Experience
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('resetExperience').addEventListener('click', ()=>{
+    document.querySelectorAll('#skillsTable td[id$="-prev"]').forEach(td=> td.textContent = '0');
+    document.querySelectorAll('#skillsTable td[id$="-earned"]').forEach(td=> td.textContent = '0');
+    recomputeAllTotals();
+  });
+
+  // initialize editability and listeners
+  makeEditableExperienceCells();
+
+  // attach roll button listener (already added later too for safety)
+  // ensure derived & skills update on load
+  calculateDerived();
+  updateInitialValues();
+});
+
+// Roll button and derived calc
+function calculateDerived(){
+  const STR = parseInt(document.getElementById('currentSTR').value)||0;
+  const CON = parseInt(document.getElementById('currentCON').value)||0;
+  const SIZ = parseInt(document.getElementById('currentSIZ').value)||0;
+  const INT = parseInt(document.getElementById('currentINT').value)||0;
+  const POW = parseInt(document.getElementById('currentPOW').value)||0;
+  const DEX = parseInt(document.getElementById('currentDEX').value)||0;
+  const species = document.getElementById('species').value.trim().toLowerCase();
+
+  // Damage Bonus
+  let total = STR+SIZ;
+  let dmgBonus='None';
+  if(total > 40){ const extra = Math.floor((total-41)/16)+1; dmgBonus=(extra+1)+'D6'; }
+  else if(total > 32){ dmgBonus='1D6'; }
+  else if(total > 24){ dmgBonus='1D3'; }
+  document.getElementById('damageBonus').value = dmgBonus;
+
+  document.getElementById('experienceBonus').value = Math.floor(INT/2);
+  document.getElementById('hitPoints').value = Math.floor((CON+SIZ)/2);
+  document.getElementById('magicPoints').value = POW;
+  document.getElementById('movement').value = (species==='elf')?4:'';
+
+  let srDEX = 0;
+  if(DEX>=1 && DEX<=8) srDEX=4; else if(DEX<=14) srDEX=3;
+  else if(DEX<=18) srDEX=2; else if(DEX>=19) srDEX=1;
+  document.getElementById('srDEX').value = srDEX;
+
+  let srSIZ = 0;
+  if(SIZ>=1 && SIZ<=8) srSIZ=3; else if(SIZ<=14) srSIZ=2;
+  else if(SIZ<=18) srSIZ=1; else if(SIZ>=19) srSIZ=1;
+  document.getElementById('srSIZ').value = srSIZ;
+}
+
+// Attach roll handler
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('rollStats').addEventListener('click', ()=>{
+    const tribe = document.getElementById('tribe').value.trim().toLowerCase();
+    const species = document.getElementById('species').value.trim().toLowerCase();
+    if(!species){ alert('Please enter a Species before rolling.'); return; }
+
+    if(tribe==='wolfrider'){
+      const stats={ STR: rollDice(2,6)+2, CON: rollDice(2,6)+6,
+        SIZ: rollDice(2,3)+1, INT: rollDice(3,6),
+        POW: rollDice(2,6)+6, DEX: rollDice(2,6)+9, APP: rollDice(2,6)+6 };
+      for(const [k,v] of Object.entries(stats)){
+        document.getElementById('current'+k).value=v;
+        document.getElementById('original'+k).value=v;
+      }
+    } else { alert('Rolling logic only implemented for Wolfrider tribe.'); }
+
+    let ageVal=0;
+    if(species==='elf'){ const a1=rollDice(1,10), a2=rollDice(1,10), m=rollDice(2,6);
+      ageVal=a1*a2*m; document.getElementById('age').value=ageVal;
+    } else { ageVal=parseInt(document.getElementById('age').value)||0; }
+
+    const powVal=parseInt(document.getElementById('currentPOW').value)||0;
+    let mate=document.getElementById('recognisedMate').value.trim();
+    const perc=percentile();
+    if(perc>ageVal/10){ document.getElementById('recognisedMate').value='None'; }
+    else if(mate!=='None' && mate!=='' && perc>powVal*5){
+      document.getElementById('recognisedMate').value='Deceased';
+    }
+
+    calculateDerived();
+    updateInitialValues();
+  });
+});
+
+// Auto-update when stats change
+['currentSTR','currentCON','currentSIZ','currentINT','currentPOW','currentDEX','currentAPP','tribe','age']
+.forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input', ()=>{ calculateDerived(); updateInitialValues(); }); });
+
+</script>
+</body>
+</html>
